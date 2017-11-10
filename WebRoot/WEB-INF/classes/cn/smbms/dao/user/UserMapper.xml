@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.smbms.dao.user.UserMapper">
+	<select id="getUserByCodeAndPwd" resultType="user">
+		select * from smbms_user
+		where userCode =#{userCode} and userPassword=#{password}
+	</select>
+	
+	<select id="getUserList" resultType="user">
+		select u.*,r.roleName as userRoleName from smbms_user u,smbms_role r 
+		where u.userRole = r.id
+		<if test="userName != null">
+			and u.userName like CONCAT('%',#{userName},'%')
+		</if>
+		<if test="userRole > 0">
+			and u.userRole = #{userRole}
+		</if>
+		order by creationDate DESC limit #{currentPageNo},#{pageSize}
+	</select>
+	
+	<select id="getUserCount" resultType="int">
+		select count(1) as count from smbms_user u,smbms_role r where u.userRole = r.id
+		<if test="userName != null and userName != ''">
+			and u.userName like CONCAT('%',#{userName},'%')
+		</if>
+		<if test="userRole > 0">
+			and u.userRole = #{userRole}
+		</if>
+	</select>
+	
+	<insert id="add">
+		insert into smbms_user (userCode,userName,userPassword,userRole,gender,birthday,phone,address,creationDate,createdBy,idPicPath) values (#{userCode},#{userName},#{userPassword},#{userRole},#{gender},#{birthday},#{phone},#{address},#{creationDate},#{createdBy},#{idPicPath})
+	</insert>
+	
+	<select id="getUserById" resultType="user">
+		select u.*,r.roleName as userRoleName from smbms_user u,smbms_role r where u.id=#{id} and u.userRole = r.id
+	</select>
+	
+	<update id="modify">
+		update smbms_user set userName=#{userName},gender=#{gender},birthday=#{birthday},phone=#{phone},address=#{address},userRole=#{userRole},modifyBy=#{modifyBy},modifyDate=#{modifyDate} where id =#{id} 
+	</update>
+	
+	<delete id="deleteUserById">
+		delete from smbms_user where id=#{id}
+	</delete>
+	
+	<update id="updatePwd">
+		update smbms_user set userPassword= #{userPassword} where id = #{id}
+	</update>
+	
+	<select id="getLoginUser" resultType="user">
+		select * from smbms_user where userCode =#{userCode}
+	</select>
+</mapper>
